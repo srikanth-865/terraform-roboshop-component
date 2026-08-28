@@ -103,9 +103,9 @@ resource "aws_launch_template" "main" {
   )
 }
 
-resource "aws_lb_target_group" "catalogue" {
+resource "aws_lb_target_group" "main" {
   name     = "${local.common_name}"
-  port     = 8080
+  port     = var.components == "frontend" ? "80" : "8080"
   protocol = "HTTP"
   vpc_id   = local.vpc_id
 
@@ -114,7 +114,7 @@ resource "aws_lb_target_group" "catalogue" {
 
     health_check {
     enabled             = true
-    path                = "/health"
+    path                = var.components == "frontend" ? "/" : "/health"
     protocol            = "HTTP"
     port                = 8080
     interval            = 10
@@ -125,8 +125,8 @@ resource "aws_lb_target_group" "catalogue" {
   }
 }
 
-resource "aws_autoscaling_group" "catalogue" {
-  name_prefix         = "${local.common_name}-catalogue"
+resource "aws_autoscaling_group" "main" {
+  name_prefix         = "${local.common_name}"
   min_size            = 1  #atlesat 1 instance for running
   max_size            = 10 #we can go upto 10 instnaces
   desired_capacity    = 2 #we want 2 instances
@@ -136,10 +136,10 @@ resource "aws_autoscaling_group" "catalogue" {
   health_check_grace_period = 120 # for 2 min we can decide instances healthy
 
   launch_template { 
-    id      = aws_launch_template.catalogue.id
+    id      = aws_launch_template.main.id
     version = "$Latest"
   }
-  target_group_arns = [aws_lb_target_group.catalogue.arn] # Autoscaling launches into specific target group catalogue 
+  target_group_arns = [aws_lb_target_group.main.arn] # Autoscaling launches into specific target group catalogue 
 
  # Forces instances to rolling-update when launch template changes
   instance_refresh {
@@ -155,7 +155,7 @@ resource "aws_autoscaling_group" "catalogue" {
 dynamic "tag" {
   for_each = merge(
     {
-      Name = "${local.common_name}-catalogue"
+      Name = "${local.common_name}"
     },
     local.common_tags
   )
@@ -175,9 +175,9 @@ dynamic "tag" {
 }
 
  # Attach the Target Tracking Policy
-resource "aws_autoscaling_policy" "catalogue" {
-  name                   = "${local.common_name}-catalogue"
-  autoscaling_group_name = aws_autoscaling_group.catalogue.name   #attahing catalogue group to this policy
+resource "aws_autoscaling_policy" "main" {
+  name                   = "${local.common_name}"
+  autoscaling_group_name = aws_autoscaling_group.main.name   #attahing catalogue group to this policy
   policy_type            = "TargetTrackingScaling"
    estimated_instance_warmup = 120  #for 2 min of instance checking
   target_tracking_configuration {
@@ -190,18 +190,33 @@ resource "aws_autoscaling_policy" "catalogue" {
 }
 }
 
-resource "aws_lb_listener_rule" "catalogue" {
-  listener_arn = local.backend_alb_listener_arn  #we attach our loadbalancer  backend_alb arn
-  priority     = 10 # we can give our priority 
+resource "aws_lb_listener_rule" "main" {
+  listener_arn = local.alb_listener_arn  #we attach our loadbalancer _alb arn based on components
+  priority     = var.rule_priority # we can give our priority 
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.catalogue.arn  #we give to our target group catalogue forwarding 
+    target_group_arn = aws_lb_target_group.main.arn  #we give to our target group catalogue forwarding 
   }
 
   condition {
     host_header {
-      values = ["catalogue.backend-alb-${var.environment}.${var.domain_name}"] #as we give *.backend-alb-Dev.srikanth865.online
+      values = [local.host_header]   #based on our components it will and condition based on locals
     }
   }
-}*/
+}
+
+
+resource "terraform_data" "main_delete" {
+  triggers_replace = [
+    aws_instance.main.id
+  ]
+  depends_on = [aws_autoscaling_policy.main]
+
+  # executes where terraform is running
+  provisioner "local-exec" {
+    command = "aws ec2 terminate-instances --instance-ids ${aws_instance.main.id}"
+  }
+}
+
+

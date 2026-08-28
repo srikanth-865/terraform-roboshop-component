@@ -11,3 +11,7 @@ variable "components"{
 variable "app_version"{
     default = "v3"
 }
+
+variable "rule_priority"{
+    
+}
