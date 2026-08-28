@@ -7,5 +7,5 @@
         environment = var.environment
         terraform = true
                 }
-    common_name = "${var.project}-${var.environment}-${var.component}"
+    common_name = "${var.project}-${var.environment}-${var.components}"
 }

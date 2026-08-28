@@ -25,5 +25,5 @@ data "aws_ssm_parameter" "private_subnet_ids" {
 }
 
 data "aws_ssm_parameter" "sg_id" {
-  name = "/${var.project}/${var.environment}/${var.component}"
+  name = "/${var.project}/${var.environment}/${var.components}"
 }
