@@ -4,7 +4,7 @@
     private_subnet_id = split(",",data.aws_ssm_parameter.private_subnet_ids.value)[0] 
     backend_alb_listener_arn = data.aws_ssm_parameter.backend_alb_listener_arn.value
     frontend_alb_listener_arn = data.aws_ssm_parameter.frontend_alb_listener_arn.value
-    alb_listener_arn = var.components == "frontend" ? local.frontend_alb_listener_arn : backend_alb_listener_arn
+    alb_listener_arn = var.components == "frontend" ? local.frontend_alb_listener_arn : local.backend_alb_listener_arn
     vpc_id = data.aws_ssm_parameter.vpc_id.value
     common_tags = {
         project = var.project

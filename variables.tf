@@ -15,3 +15,7 @@ variable "app_version"{
 variable "rule_priority"{
     
 }
+
+variable "domain_name"{
+    
+}

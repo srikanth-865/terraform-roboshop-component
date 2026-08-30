@@ -130,7 +130,7 @@ resource "aws_autoscaling_group" "main" {
   min_size            = 1  #atlesat 1 instance for running
   max_size            = 10 #we can go upto 10 instnaces
   desired_capacity    = 2 #we want 2 instances
-  vpc_zone_identifier = [local.private_subnet_id[0]] # Replace with your Subnet IDs
+  vpc_zone_identifier = [local.private_subnet_id] # Replace with your Subnet IDs
    force_delete              = false
   health_check_type         = "ELB"
   health_check_grace_period = 120 # for 2 min we can decide instances healthy
