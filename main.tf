@@ -39,7 +39,7 @@ resource "terraform_data" "main" {
   }
 }
  
- resource "aws_ec2_instance_state" "main" {   
+ /*resource "aws_ec2_instance_state" "main" {   
   instance_id = aws_instance.main.id
   state       = "stopped"
   depends_on = [terraform_data.main]   #its for stopping the instance after completing of terraform data
@@ -104,7 +104,7 @@ resource "aws_launch_template" "main" {
 }
 
 #its flow of steps for anything chanages in verison
-/*resource "aws_lb_target_group" "main" {
+resource "aws_lb_target_group" "main" {
   name     = "${local.common_name}"
   port     = var.components == "frontend" ? "80" : "8080"
   protocol = "HTTP"
