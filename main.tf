@@ -103,7 +103,8 @@ resource "aws_launch_template" "main" {
   )
 }
 
-resource "aws_lb_target_group" "main" {
+#its flow of steps for anything chanages in verison
+/*resource "aws_lb_target_group" "main" {
   name     = "${local.common_name}"
   port     = var.components == "frontend" ? "80" : "8080"
   protocol = "HTTP"
@@ -217,6 +218,6 @@ resource "terraform_data" "main_delete" {
   provisioner "local-exec" {
     command = "aws ec2 terminate-instances --instance-ids ${aws_instance.main.id}"
   }
-}
+}*/
 
 
