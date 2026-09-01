@@ -12,5 +12,5 @@
         terraform = true
                 }
     common_name = "${var.project}-${var.environment}-${var.components}"
-    host_header = var.components == "frontend" ? "${var.project}-${var.environment}-${var.domain_name}" : "${var.components}-backend-alb-${var.environment}.${var.domain_name}"
+    host_header = var.components == "frontend" ? "${var.project}-${var.environment}.${var.domain_name}" : "${var.components}-backend-alb-${var.environment}.${var.domain_name}"
 }
