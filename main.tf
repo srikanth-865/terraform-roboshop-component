@@ -114,10 +114,9 @@ resource "aws_lb_target_group" "main" {
   deregistration_delay = 30 #seconds
 
     health_check {
-    enabled             = true
     path                = var.components == "frontend" ? "/" : "/health"
     protocol            = "HTTP"
-    port                = 8080
+    port                = var.components == "frontend" ? "80" : "8080"
     interval            = 10
     timeout             = 5 #secs
     healthy_threshold   = 2
