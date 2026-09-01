@@ -129,7 +129,7 @@ resource "aws_autoscaling_group" "main" {
   name_prefix         = "${local.common_name}"
   min_size            = 1  #atlesat 1 instance for running
   max_size            = 10 #we can go upto 10 instnaces
-  desired_capacity    = 2 #we want 2 instances
+  desired_capacity    = 1 #actually we want 2 instances required but our account givew quota 32 only
   vpc_zone_identifier = [local.private_subnet_id] # Replace with your Subnet IDs
    force_delete              = false
   health_check_type         = "ELB"
